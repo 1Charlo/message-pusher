@@ -43,7 +43,10 @@ function renderStatus(status) {
 
 const MessagesTable = () => {
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(["000000", "DEFAULT_ACT", true]);
+  // const [loading, setLoading] = useState(true);
+  // const [loadingId, setLoadingId] = useState("");
+  // const [loadingAct, setLoadingAct] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(10);
   const autoRefreshSecondsRef = useRef(autoRefreshSeconds);
@@ -130,7 +133,10 @@ const MessagesTable = () => {
   }, []);
 
   const viewMessage = async (id) => {
-    setLoading(true);
+    setLoading([id, "view", true]);
+    // setLoading(true);
+    // setLoadingId(id);
+    // setLoadingAct("view")
     const res = await API.get(`/api/message/${id}`);
     const { success, message, data } = res.data;
     if (success) {
@@ -139,11 +145,17 @@ const MessagesTable = () => {
     } else {
       showError(message);
     }
-    setLoading(false);
+    setLoading(["000000", "DEFAULT_ACT", false]);
+    // setLoading(false);
+    // setLoadingId("");
+    // setLoadingAct("");
   };
 
   const resendMessage = async (id) => {
-    setLoading(true);
+    setLoading([id, "resend", true]);
+    // setLoading(true);
+    // setLoadingId(id);
+    // setLoadingAct("resend")
     const res = await API.post(`/api/message/resend/${id}`);
     const { success, message } = res.data;
     if (success) {
@@ -151,11 +163,17 @@ const MessagesTable = () => {
     } else {
       showError(message);
     }
-    setLoading(false);
+    setLoading(["000000", "DEFAULT_ACT", false]);
+    // setLoading(false);
+    // setLoadingId("");
+    // setLoadingAct("");
   };
 
   const deleteMessage = async (id, idx) => {
-    setLoading(true);
+    setLoading([id, "delete", true]);
+    // setLoading(true);
+    // setLoadingId(id);
+    // setLoadingAct("delete")
     const res = await API.delete(`/api/message/${id}`);
     const { success, message } = res.data;
     if (success) {
@@ -167,7 +185,10 @@ const MessagesTable = () => {
     } else {
       showError(message);
     }
-    setLoading(false);
+    setLoading(["000000", "DEFAULT_ACT", false]);
+    // setLoading(false);
+    // setLoadingId("");
+    // setLoadingAct("");
   };
 
   const searchMessages = async () => {
@@ -326,7 +347,7 @@ const MessagesTable = () => {
                       <Button
                         size={'small'}
                         positive
-                        loading={loading}
+                        loading={loading[0] == message.id && loading[1] == "view" && loading[2]}
                         onClick={() => {
                           viewMessage(message.id).then();
                         }}
@@ -336,7 +357,7 @@ const MessagesTable = () => {
                       <Button
                         size={'small'}
                         primary
-                        loading={loading}
+                        loading={'false'}
                         as={Link}
                         to={'/editor/' + message.id}
                       >
@@ -345,7 +366,7 @@ const MessagesTable = () => {
                       <Button
                         size={'small'}
                         color={'yellow'}
-                        loading={loading}
+                        loading={loading[0] == message.id && loading[1] == "resend" && loading[2]}
                         onClick={() => {
                           resendMessage(message.id).then();
                         }}
@@ -355,7 +376,7 @@ const MessagesTable = () => {
                       <Button
                         size={'small'}
                         negative
-                        loading={loading}
+                        loading={loading[0] == message.id && loading[1] == "delete" && loading[2]}
                         onClick={() => {
                           deleteMessage(message.id, idx).then();
                         }}
