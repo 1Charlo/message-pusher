@@ -113,6 +113,8 @@ func SendWeChatCorpMessage(message *model.Message, user *model.User, channel_ *m
 	if err != nil {
 		return err
 	}
+	jsonBytes, _ := json.Marshal(message)
+	common.SysLog("数据组装前的消息是：" + string(jsonBytes))
 	userId := channel_.AccountId
 	clientType := channel_.Other
 	agentSecret := channel_.Secret
@@ -125,9 +127,11 @@ func SendWeChatCorpMessage(message *model.Message, user *model.User, channel_ *m
 	}
 	if message.Content == "" {
 		if message.Title == "" {
+			common.SysLog("发送纯文本消息")
 			messageRequest.MessageType = "text"
 			messageRequest.Text.Content = message.Description
 		} else {
+			common.SysLog("发送卡片消息")
 			messageRequest.MessageType = "textcard"
 			messageRequest.TextCard.Title = message.Title
 			messageRequest.TextCard.Description = message.Description
@@ -135,11 +139,13 @@ func SendWeChatCorpMessage(message *model.Message, user *model.User, channel_ *m
 		}
 	} else {
 		if clientType == "plugin" {
+			common.SysLog("发送plugin的卡片消息")
 			messageRequest.MessageType = "textcard"
 			messageRequest.TextCard.Title = message.Title
 			messageRequest.TextCard.Description = message.Description
 			messageRequest.TextCard.URL = message.URL
 		} else {
+			common.SysLog("发送plugin的markdown消息")
 			messageRequest.MessageType = "markdown"
 			messageRequest.Markdown.Content = message.Content
 		}
@@ -148,6 +154,7 @@ func SendWeChatCorpMessage(message *model.Message, user *model.User, channel_ *m
 	if err != nil {
 		return err
 	}
+	common.SysLog("要发送的消息是：" + string(jsonData))
 	key := fmt.Sprintf("%s%s%s", corpId, agentId, agentSecret)
 	accessToken := TokenStoreGetToken(key)
 	resp, err := http.Post(fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=%s", accessToken), "application/json",
