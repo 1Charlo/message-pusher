@@ -44,9 +44,6 @@ function renderStatus(status) {
 const MessagesTable = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(["000000", "DEFAULT_ACT", true]);
-  // const [loading, setLoading] = useState(true);
-  // const [loadingId, setLoadingId] = useState("");
-  // const [loadingAct, setLoadingAct] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(10);
   const autoRefreshSecondsRef = useRef(autoRefreshSeconds);
@@ -62,7 +59,7 @@ const MessagesTable = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
 
   const loadMessages = async (startIdx) => {
-    setLoading(true);
+    setLoading(["", "refresh", true]);
     const res = await API.get(`/api/message/?p=${startIdx}`);
     const { success, message, data } = res.data;
     if (success) {
@@ -76,7 +73,7 @@ const MessagesTable = () => {
     } else {
       showError(message);
     }
-    setLoading(false);
+    setLoading(["", "refresh", false]);
   };
 
   const onPaginationChange = (e, { activePage }) => {
@@ -134,9 +131,6 @@ const MessagesTable = () => {
 
   const viewMessage = async (id) => {
     setLoading([id, "view", true]);
-    // setLoading(true);
-    // setLoadingId(id);
-    // setLoadingAct("view")
     const res = await API.get(`/api/message/${id}`);
     const { success, message, data } = res.data;
     if (success) {
@@ -146,16 +140,10 @@ const MessagesTable = () => {
       showError(message);
     }
     setLoading(["000000", "DEFAULT_ACT", false]);
-    // setLoading(false);
-    // setLoadingId("");
-    // setLoadingAct("");
   };
 
   const resendMessage = async (id) => {
     setLoading([id, "resend", true]);
-    // setLoading(true);
-    // setLoadingId(id);
-    // setLoadingAct("resend")
     const res = await API.post(`/api/message/resend/${id}`);
     const { success, message } = res.data;
     if (success) {
@@ -164,16 +152,10 @@ const MessagesTable = () => {
       showError(message);
     }
     setLoading(["000000", "DEFAULT_ACT", false]);
-    // setLoading(false);
-    // setLoadingId("");
-    // setLoadingAct("");
   };
 
   const deleteMessage = async (id, idx) => {
     setLoading([id, "delete", true]);
-    // setLoading(true);
-    // setLoadingId(id);
-    // setLoadingAct("delete")
     const res = await API.delete(`/api/message/${id}`);
     const { success, message } = res.data;
     if (success) {
@@ -186,9 +168,6 @@ const MessagesTable = () => {
       showError(message);
     }
     setLoading(["000000", "DEFAULT_ACT", false]);
-    // setLoading(false);
-    // setLoadingId("");
-    // setLoadingAct("");
   };
 
   const searchMessages = async () => {
@@ -357,7 +336,6 @@ const MessagesTable = () => {
                       <Button
                         size={'small'}
                         primary
-                        loading={'false'}
                         as={Link}
                         to={'/editor/' + message.id}
                       >
@@ -395,24 +373,12 @@ const MessagesTable = () => {
             <Table.HeaderCell colSpan='6'>
               <Button
                 size='small'
-                loading={loading}
+                loading={loading[1] == "refresh"}
                 onClick={() => {
                   refresh().then();
                 }}
               >
                 手动刷新
-              </Button>
-              <Button
-                size='small'
-                loading={loading}
-                onClick={() => {
-                  setAutoRefresh(!autoRefresh);
-                  setAutoRefreshSeconds(10);
-                }}
-              >
-                {autoRefresh
-                  ? `自动刷新中（${autoRefreshSeconds} 秒后刷新）`
-                  : '自动刷新'}
               </Button>
               <Pagination
                 floated='right'
