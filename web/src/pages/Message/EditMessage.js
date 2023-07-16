@@ -114,12 +114,13 @@ const EditMessage = () => {
             />
           </Form.Group>
           <Form.Group widths='equal'>
-            <Form.Input
+            <Form.TextArea
               label='描述'
               placeholder='请输入消息描述'
               value={inputs.description}
               name='description'
               onChange={handleInputChange}
+              style={{ minHeight: 200, fontFamily: 'JetBrains Mono, Consolas' }}
             />
           </Form.Group>
           <Form.Group widths='equal'>
