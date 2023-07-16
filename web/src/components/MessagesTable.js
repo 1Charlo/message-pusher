@@ -373,7 +373,7 @@ const MessagesTable = () => {
             <Table.HeaderCell colSpan='6'>
               <Button
                 size='small'
-                loading={loading[1] == "refresh"}
+                loading={loading[1] == "refresh" && loading[2]}
                 onClick={() => {
                   refresh().then();
                 }}
