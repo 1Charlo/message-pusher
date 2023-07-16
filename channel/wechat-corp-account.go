@@ -113,6 +113,10 @@ func SendWeChatCorpMessage(message *model.Message, user *model.User, channel_ *m
 	if err != nil {
 		return err
 	}
+	// 在真正要开始发送消息的时候，将默认添加的系统消息标题给还原
+	if message.Title == common.SystemName {
+		message.Title = ""
+	}
 	jsonBytes, _ := json.Marshal(message)
 	common.SysLog("数据组装前的消息是：" + string(jsonBytes))
 	userId := channel_.AccountId

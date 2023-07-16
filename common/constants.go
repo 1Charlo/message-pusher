@@ -1,14 +1,15 @@
 package common
 
 import (
-	"github.com/google/uuid"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"
-var SystemName = "消息推送服务"
+var SystemName = "消息推送服务#SYSTEM"
 var ServerAddress = "http://localhost:3000"
 var Footer = ""
 var HomePageLink = ""
