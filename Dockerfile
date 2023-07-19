@@ -15,7 +15,7 @@ ENV GO111MODULE=on \
 WORKDIR /build
 COPY . .
 COPY --from=builder /build/build ./web/build
-go env -w  GOPROXY=https://goproxy.cn,direct
+RUN go env -w  GOPROXY=https://goproxy.cn,direct
 RUN go mod download
 RUN go build -ldflags "-s -w -X 'message-pusher/common.Version=$(cat VERSION)' -extldflags '-static'" -o message-pusher
 
