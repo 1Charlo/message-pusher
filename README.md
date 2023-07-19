@@ -44,6 +44,15 @@ _✨ 搭建专属于你的消息推送服务，支持多种消息推送方式，
 
 > **Warning**：从 `v0.3` 版本升级到 `v0.4` 版本需要手动迁移数据库，具体方法见[迁移数据库](#迁移数据库)。
 
+
+## 感谢
+Base on [songquanpeng/message-pusher](https://github.com/songquanpeng/message-pusher)
+
+- 修复不能发纯文本消息的bug
+- 编辑页面，描述改为Textarea
+- 修复消息列表页刷新loading的bug
+
+
 ## 描述
 1. **多种消息推送方式**：
    + 邮件消息，
