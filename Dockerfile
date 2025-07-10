@@ -3,8 +3,8 @@ FROM node:16 as builder
 WORKDIR /build
 COPY ./web .
 COPY ./VERSION .
-RUN npm install --registry=https://registry.npm.taobao.org
-RUN REACT_APP_VERSION=$(cat VERSION) npm run build
+RUN yarn install
+RUN REACT_APP_VERSION=$(cat VERSION) yarn build
 
 FROM golang AS builder2
 
@@ -15,7 +15,6 @@ ENV GO111MODULE=on \
 WORKDIR /build
 COPY . .
 COPY --from=builder /build/build ./web/build
-RUN go env -w  GOPROXY=https://goproxy.cn,direct
 RUN go mod download
 RUN go build -ldflags "-s -w -X 'message-pusher/common.Version=$(cat VERSION)' -extldflags '-static'" -o message-pusher
 
