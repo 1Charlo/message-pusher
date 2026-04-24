@@ -391,6 +391,41 @@ const EditChannel = () => {
             </Form.Group>
           </>
         );
+      case 'lark_global':
+        return (
+          <>
+            <Message>
+              通过Lark群机器人进行推送，飞书桌面客户端的配置流程：选择一个群聊
+              -> 设置 -> 群机器人 -> 添加机器人 -> 自定义机器人 -> 添加（
+              <strong>注意选中「签名校验」</strong>）。具体参见：
+              <a
+                target='_blank'
+                href='https://open.feishu.cn/document/ukTMukTMukTM/ucTM5YjL3ETO24yNxkjN'
+              >
+                飞书开放文档
+              </a>
+            </Message>
+            <Form.Group widths={2}>
+              <Form.Input
+                label='Webhook 地址'
+                name='url'
+                onChange={handleInputChange}
+                autoComplete='new-password'
+                value={inputs.url}
+                placeholder='在此填写飞书提供的 Webhook 地址'
+              />
+              <Form.Input
+                label='签名校验密钥'
+                name='secret'
+                type='password'
+                onChange={handleInputChange}
+                autoComplete='new-password'
+                value={inputs.secret}
+                placeholder='在此填写飞书提供的签名校验密钥'
+              />
+            </Form.Group>
+          </>
+        );
       case 'ding':
         return (
           <>
@@ -617,6 +652,63 @@ const EditChannel = () => {
             <Message>
               通过飞书自建应用进行推送，点击前往配置：
               <a target='_blank' href='https://open.feishu.cn/app'>
+                飞书开放平台
+              </a>
+              。
+              <br />
+              需要为应用添加机器人能力：应用能力->添加应用能力—>机器人。
+              <br />
+              需要为应用添加消息发送权限：开发配置->权限管理->权限配置->搜索「获取与发送单聊、群组消息」->开通权限。
+              <br />
+              注意，添加完成权限后需要发布版本提交审核才能见效。
+              <br />
+              注意，推送目标的格式为：
+              <strong>
+                <code>类型:ID</code>
+              </strong>
+              ，详见飞书
+              <a
+                href='https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/create#bc6d1214'
+                target='_blank'
+              >
+                开发文档
+              </a>
+              中查询参数一节。
+            </Message>
+            <Form.Group widths={3}>
+              <Form.Input
+                label='App ID'
+                name='app_id'
+                onChange={handleInputChange}
+                autoComplete='new-password'
+                value={inputs.app_id}
+                placeholder='应用凭证 -> App ID'
+              />
+              <Form.Input
+                label='App Secret'
+                name='secret'
+                onChange={handleInputChange}
+                autoComplete='new-password'
+                value={inputs.secret}
+                placeholder='应用凭证 -> App Secret'
+              />
+              <Form.Input
+                label='默认推送目标'
+                name='account_id'
+                onChange={handleInputChange}
+                autoComplete='new-password'
+                value={inputs.account_id}
+                placeholder='格式必须为：<类型>:<ID>，例如 open_id:123456'
+              />
+            </Form.Group>
+          </>
+        );
+      case 'lark_global_app':
+        return (
+          <>
+            <Message>
+              通过飞书自建应用进行推送，点击前往配置：
+              <a target='_blank' href='https://open.larksuite.com/app'>
                 飞书开放平台
               </a>
               。
