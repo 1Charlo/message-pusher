@@ -11,6 +11,7 @@ const (
 	TypeWeChatCorpAccount = "corp_app"
 	TypeCorp              = "corp"
 	TypeLark              = "lark"
+	TypeLarkGlobal        = "lark_global"
 	TypeDing              = "ding"
 	TypeTelegram          = "telegram"
 	TypeDiscord           = "discord"
@@ -20,6 +21,7 @@ const (
 	TypeOneBot            = "one_bot"
 	TypeGroup             = "group"
 	TypeLarkApp           = "lark_app"
+	TypeLarkGlobalApp     = "lark_global_app"
 	TypeCustom            = "custom"
 	TypeTencentAlarm      = "tencent_alarm"
 )
@@ -69,7 +71,7 @@ func GetChannelByName(name string, userId int) (*Channel, error) {
 }
 
 func GetTokenStoreChannels() (channels []*Channel, err error) {
-	err = DB.Where("type in ?", []string{TypeWeChatCorpAccount, TypeWeChatTestAccount, TypeLarkApp}).Find(&channels).Error
+	err = DB.Where("type in ?", []string{TypeWeChatCorpAccount, TypeWeChatTestAccount, TypeLarkApp, TypeLarkGlobalApp}).Find(&channels).Error
 	return channels, err
 }
 

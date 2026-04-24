@@ -17,6 +17,8 @@ func SendMessage(message *model.Message, user *model.User, channel_ *model.Chann
 		return SendCorpMessage(message, user, channel_)
 	case model.TypeLark:
 		return SendLarkMessage(message, user, channel_)
+	case model.TypeLarkGlobal:
+		return SendLarkGlobalMessage(message, user, channel_)
 	case model.TypeDing:
 		return SendDingMessage(message, user, channel_)
 	case model.TypeBark:
@@ -35,6 +37,8 @@ func SendMessage(message *model.Message, user *model.User, channel_ *model.Chann
 		return SendGroupMessage(message, user, channel_)
 	case model.TypeLarkApp:
 		return SendLarkAppMessage(message, user, channel_)
+	case model.TypeLarkGlobalApp:
+		return SendLarkGlobalAppMessage(message, user, channel_)
 	case model.TypeCustom:
 		return SendCustomMessage(message, user, channel_)
 	case model.TypeTencentAlarm:
