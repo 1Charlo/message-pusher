@@ -49,7 +49,6 @@ func channel2item(channel_ *model.Channel) TokenStoreItem {
 			AppSecret: channel_.Secret,
 		}
 		return item
-	}
 	case model.TypeLarkGlobalApp:
 		item := &LarkAppTokenStoreItem{
 			AppID:     channel_.AppId,
