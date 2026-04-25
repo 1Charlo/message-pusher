@@ -160,7 +160,7 @@ func SendLarkAppMessage(message *model.Message, user *model.User, channel_ *mode
 			if err != nil {
 				return err
 			}
-			finalContent = contentData
+			finalContent = string(contentData)
 		}
 		
 		request.Content = finalContent
