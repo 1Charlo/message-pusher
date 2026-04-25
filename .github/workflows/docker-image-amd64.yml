@@ -3,7 +3,8 @@ name: Build Dev Image
 on:
   push:
     branches: [ "dev" ] # 仅在 dev 分支推送时触发
-    tags: [ "v*" ]
+  release:
+    types: [ published ]
 
 jobs:
   build-and-push:
