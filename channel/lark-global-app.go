@@ -117,21 +117,31 @@ func SendLarkGlobalAppMessage(message *model.Message, user *model.User, channel_
 		request.Content = string(contentData)
 	} else {
 		request.MsgType = "interactive"
-		content := larkGlobalCardContent{}
-		content.Config.WideScreenMode = true
-		content.Config.EnableForward = true
-		content.Elements = append(content.Elements, larkGlobalMessageRequestCardElement{
-			Tag: "div",
-			Text: larkGlobalMessageRequestCardElementText{
-				Content: atPrefix + message.Content,
-				Tag:     "lark_md",
-			},
-		})
-		contentData, err := json.Marshal(content)
-		if err != nil {
-			return err
-		}
-		request.Content = string(contentData)
+
+        // 如果内容本来就是一段完整的消息卡片格式的json，就直接使用
+        // 如果内容是一段纯文本内容，就构造成消息卡片格式的json数据
+        var finalContent string
+        if isCardContent(message.Content) {
+            finalContent = strings.TrimSpace(message.Content)  // 清理一下
+        } else {
+            content := larkGlobalCardContent{}
+            content.Config.WideScreenMode = true
+            content.Config.EnableForward = true
+            content.Elements = append(content.Elements, larkGlobalMessageRequestCardElement{
+                Tag: "div",
+                Text: larkGlobalMessageRequestCardElementText{
+                    Content: atPrefix + message.Content,
+                    Tag:     "lark_md",
+                },
+            })
+            contentData, err := json.Marshal(content)
+            if err != nil {
+                return err
+            }
+            finalContent = string(contentData)
+        }
+
+        request.Content = finalContent
 	}
 	requestData, err := json.Marshal(request)
 	if err != nil {

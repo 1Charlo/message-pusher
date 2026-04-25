@@ -95,6 +95,26 @@ func parseLarkAppTarget(target string) (string, string, error) {
 	return parts[0], parts[1], nil
 }
 
+// 判断传入的内容是否已经是完整的卡片 JSON
+func isCardContent(content string) bool {
+    if content == "" {
+        return false
+    }
+    
+    // 简单快速判断：是否包含 "config" 和 "elements" 两个关键字段
+    // 更稳妥的做法是尝试解析成 map 并检查字段
+    var card map[string]interface{}
+    err := json.Unmarshal([]byte(content), &card)
+    if err != nil {
+        return false
+    }
+    
+    _, hasConfig := card["config"]
+    _, hasElements := card["elements"]
+    
+    return hasConfig && hasElements
+}
+
 func SendLarkAppMessage(message *model.Message, user *model.User, channel_ *model.Channel) error {
 	// https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/create
 	rawTarget := message.To
@@ -119,21 +139,31 @@ func SendLarkAppMessage(message *model.Message, user *model.User, channel_ *mode
 		request.Content = string(contentData)
 	} else {
 		request.MsgType = "interactive"
-		content := larkCardContent{}
-		content.Config.WideScreenMode = true
-		content.Config.EnableForward = true
-		content.Elements = append(content.Elements, larkMessageRequestCardElement{
-			Tag: "div",
-			Text: larkMessageRequestCardElementText{
-				Content: atPrefix + message.Content,
-				Tag:     "lark_md",
-			},
-		})
-		contentData, err := json.Marshal(content)
-		if err != nil {
-			return err
+
+		// 如果内容本来就是一段完整的消息卡片格式的json，就直接使用
+        // 如果内容是一段纯文本内容，就构造成消息卡片格式的json数据
+        var finalContent string
+        if isCardContent(message.Content) {
+            finalContent = strings.TrimSpace(message.Content)  // 清理一下
+        } else {
+			content := larkCardContent{}
+			content.Config.WideScreenMode = true
+			content.Config.EnableForward = true
+			content.Elements = append(content.Elements, larkMessageRequestCardElement{
+				Tag: "div",
+				Text: larkMessageRequestCardElementText{
+					Content: atPrefix + message.Content,
+					Tag:     "lark_md",
+				},
+			})
+			contentData, err := json.Marshal(content)
+			if err != nil {
+				return err
+			}
+			finalContent = contentData
 		}
-		request.Content = string(contentData)
+		
+		request.Content = finalContent
 	}
 	requestData, err := json.Marshal(request)
 	if err != nil {
