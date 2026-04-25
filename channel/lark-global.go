@@ -15,42 +15,42 @@ import (
 	"time"
 )
 
-type larkMessageRequestCardElementText struct {
+type larkGlobalMessageRequestCardElementText struct {
 	Content string `json:"content"`
 	Tag     string `json:"tag"`
 }
 
-type larkMessageRequestCardElement struct {
+type larkGlobalMessageRequestCardElement struct {
 	Tag  string                            `json:"tag"`
-	Text larkMessageRequestCardElementText `json:"text"`
+	Text larkGlobalMessageRequestCardElementText `json:"text"`
 }
 
-type larkTextContent struct {
+type larkGlobalTextContent struct {
 	Text string `json:"text"`
 }
 
-type larkCardContent struct {
+type larkGlobalCardContent struct {
 	Config struct {
 		WideScreenMode bool `json:"wide_screen_mode"`
 		EnableForward  bool `json:"enable_forward"`
 	}
-	Elements []larkMessageRequestCardElement `json:"elements"`
+	Elements []larkGlobalMessageRequestCardElement `json:"elements"`
 }
 
-type larkMessageRequest struct {
+type larkGlobalMessageRequest struct {
 	MessageType string          `json:"msg_type"`
 	Timestamp   string          `json:"timestamp"`
 	Sign        string          `json:"sign"`
-	Content     larkTextContent `json:"content"`
-	Card        larkCardContent `json:"card"`
+	Content     larkGlobalTextContent `json:"content"`
+	Card        larkGlobalCardContent `json:"card"`
 }
 
-type larkMessageResponse struct {
+type larkGlobalMessageResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"msg"`
 }
 
-func getLarkAtPrefix(message *model.Message) string {
+func getLarkGlobalAtPrefix(message *model.Message) string {
 	atPrefix := ""
 	if message.To != "" {
 		if message.To == "@all" {
@@ -66,10 +66,10 @@ func getLarkAtPrefix(message *model.Message) string {
 }
 
 func SendLarkGlobalMessage(message *model.Message, user *model.User, channel_ *model.Channel) error {
-	messageRequest := larkMessageRequest{
+	messageRequest := larkGlobalMessageRequest{
 		MessageType: "text",
 	}
-	atPrefix := getLarkAtPrefix(message)
+	atPrefix := getLarkGlobalAtPrefix(message)
 	if message.Content == "" {
 		messageRequest.MessageType = "text"
 		messageRequest.Content.Text = atPrefix + message.Description
@@ -77,9 +77,9 @@ func SendLarkGlobalMessage(message *model.Message, user *model.User, channel_ *m
 		messageRequest.MessageType = "interactive"
 		messageRequest.Card.Config.WideScreenMode = true
 		messageRequest.Card.Config.EnableForward = true
-		messageRequest.Card.Elements = append(messageRequest.Card.Elements, larkMessageRequestCardElement{
+		messageRequest.Card.Elements = append(messageRequest.Card.Elements, larkGlobalMessageRequestCardElement{
 			Tag: "div",
-			Text: larkMessageRequestCardElementText{
+			Text: larkGlobalMessageRequestCardElementText{
 				Content: atPrefix + message.Content,
 				Tag:     "lark_md",
 			},
@@ -88,7 +88,7 @@ func SendLarkGlobalMessage(message *model.Message, user *model.User, channel_ *m
 
 	now := time.Now()
 	timestamp := now.Unix()
-	sign, err := larkSign(channel_.Secret, timestamp)
+	sign, err := larkGlobalSign(channel_.Secret, timestamp)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func SendLarkGlobalMessage(message *model.Message, user *model.User, channel_ *m
 	if err != nil {
 		return err
 	}
-	var res larkMessageResponse
+	var res larkGlobalMessageResponse
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return err
@@ -114,7 +114,7 @@ func SendLarkGlobalMessage(message *model.Message, user *model.User, channel_ *m
 	return nil
 }
 
-func larkSign(secret string, timestamp int64) (string, error) {
+func larkGlobalSign(secret string, timestamp int64) (string, error) {
 	stringToSign := fmt.Sprintf("%v", timestamp) + "\n" + secret
 	var data []byte
 	h := hmac.New(sha256.New, []byte(stringToSign))

@@ -11,45 +11,45 @@ import (
 	"strings"
 )
 
-type larkAppTokenRequest struct {
+type larkGlobalAppTokenRequest struct {
 	AppID     string `json:"app_id"`
 	AppSecret string `json:"app_secret"`
 }
 
-type larkAppTokenResponse struct {
+type larkGlobalAppTokenResponse struct {
 	Code              int    `json:"code"`
 	Msg               string `json:"msg"`
 	TenantAccessToken string `json:"tenant_access_token"`
 	Expire            int    `json:"expire"`
 }
 
-type LarkAppTokenStoreItem struct {
+type LarkGlobalAppTokenStoreItem struct {
 	AppID       string
 	AppSecret   string
 	AccessToken string
 }
 
-func (i *LarkAppTokenStoreItem) Key() string {
+func (i *LarkGlobalAppTokenStoreItem) Key() string {
 	return i.AppID + i.AppSecret
 }
 
-func (i *LarkAppTokenStoreItem) IsShared() bool {
+func (i *LarkGlobalAppTokenStoreItem) IsShared() bool {
 	var count int64 = 0
 	model.DB.Model(&model.Channel{}).Where("secret = ? and app_id = ? and type = ?",
 		i.AppSecret, i.AppID, model.TypeLarkApp).Count(&count)
 	return count > 1
 }
 
-func (i *LarkAppTokenStoreItem) IsFilled() bool {
+func (i *LarkGlobalAppTokenStoreItem) IsFilled() bool {
 	return i.AppID != "" && i.AppSecret != ""
 }
 
-func (i *LarkAppTokenStoreItem) Token() string {
+func (i *LarkGlobalAppTokenStoreItem) Token() string {
 	return i.AccessToken
 }
 
-func (i *LarkAppTokenStoreItem) Refresh() {
-	tokenRequest := larkAppTokenRequest{
+func (i *LarkGlobalAppTokenStoreItem) Refresh() {
+	tokenRequest := larkGlobalAppTokenRequest{
 		AppID:     i.AppID,
 		AppSecret: i.AppSecret,
 	}
@@ -61,10 +61,10 @@ func (i *LarkAppTokenStoreItem) Refresh() {
 		return
 	}
 	defer responseData.Body.Close()
-	var res larkAppTokenResponse
+	var res larkGlobalAppTokenResponse
 	err = json.NewDecoder(responseData.Body).Decode(&res)
 	if err != nil {
-		common.SysError("failed to decode larkAppTokenResponse: " + err.Error())
+		common.SysError("failed to decode larkGlobalAppTokenResponse: " + err.Error())
 		return
 	}
 	if res.Code != 0 {
@@ -75,21 +75,21 @@ func (i *LarkAppTokenStoreItem) Refresh() {
 	common.SysLog("access token refreshed")
 }
 
-type larkAppMessageRequest struct {
+type larkGlobalAppMessageRequest struct {
 	ReceiveId string `json:"receive_id"`
 	MsgType   string `json:"msg_type"`
 	Content   string `json:"content"`
 }
 
-type larkAppMessageResponse struct {
+type larkGlobalAppMessageResponse struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 }
 
-func parseLarkAppTarget(target string) (string, string, error) {
+func parseLarkGlobalAppTarget(target string) (string, string, error) {
 	parts := strings.Split(target, ":")
 	if len(parts) != 2 {
-		return "", "", errors.New("无效的飞书应用号消息接收者参数")
+		return "", "", errors.New("无效的Lark应用号消息接收者参数")
 	}
 	return parts[0], parts[1], nil
 }
@@ -99,17 +99,17 @@ func SendLarkGlobalAppMessage(message *model.Message, user *model.User, channel_
 	if rawTarget == "" {
 		rawTarget = channel_.AccountId
 	}
-	targetType, target, err := parseLarkAppTarget(rawTarget)
+	targetType, target, err := parseLarkGlobalAppTarget(rawTarget)
 	if err != nil {
 		return err
 	}
-	request := larkAppMessageRequest{
+	request := larkGlobalAppMessageRequest{
 		ReceiveId: target,
 	}
-	atPrefix := getLarkAtPrefix(message)
+	atPrefix := getLarkGlobalAtPrefix(message)
 	if message.Description != "" {
 		request.MsgType = "text"
-		content := larkTextContent{Text: atPrefix + message.Description}
+		content := larkGlobalTextContent{Text: atPrefix + message.Description}
 		contentData, err := json.Marshal(content)
 		if err != nil {
 			return err
@@ -117,12 +117,12 @@ func SendLarkGlobalAppMessage(message *model.Message, user *model.User, channel_
 		request.Content = string(contentData)
 	} else {
 		request.MsgType = "interactive"
-		content := larkCardContent{}
+		content := larkGlobalCardContent{}
 		content.Config.WideScreenMode = true
 		content.Config.EnableForward = true
-		content.Elements = append(content.Elements, larkMessageRequestCardElement{
+		content.Elements = append(content.Elements, larkGlobalMessageRequestCardElement{
 			Tag: "div",
-			Text: larkMessageRequestCardElementText{
+			Text: larkGlobalMessageRequestCardElementText{
 				Content: atPrefix + message.Content,
 				Tag:     "lark_md",
 			},
@@ -147,7 +147,7 @@ func SendLarkGlobalAppMessage(message *model.Message, user *model.User, channel_
 	if err != nil {
 		return err
 	}
-	var res larkAppMessageResponse
+	var res larkGlobalAppMessageResponse
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return err
