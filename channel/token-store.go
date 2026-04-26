@@ -74,7 +74,7 @@ func TokenStoreInit() {
 	s.Map = make(map[string]*TokenStoreItem)
 	// https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
 	// https://developer.work.weixin.qq.com/document/path/91039
-	s.ExpirationSeconds = 2 * 55 * 60 // 2 hours - 5 minutes
+	s.ExpirationSeconds = 2 * 50 * 60 // 2 hours - 10 minutes
 	go func() {
 		channels, err := model.GetTokenStoreChannels()
 		if err != nil {
