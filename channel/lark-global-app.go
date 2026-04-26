@@ -124,13 +124,16 @@ func SendLarkGlobalAppMessage(message *model.Message, user *model.User, channel_
         if isCardContent(message.Content) {
             finalContent = strings.TrimSpace(message.Content)  // 清理一下
         } else {
+			finalText := message.Content
+			finalText = strings.ReplaceAll(finalText, `\n`, "\n")   // 把 \\n 替换成实际换行
+    		finalText = strings.ReplaceAll(finalText, `\\n`, "\n")
             content := larkGlobalCardContent{}
             content.Config.WideScreenMode = true
             content.Config.EnableForward = true
             content.Elements = append(content.Elements, larkGlobalMessageRequestCardElement{
                 Tag: "div",
                 Text: larkGlobalMessageRequestCardElementText{
-                    Content: atPrefix + message.Content,
+                    Content: atPrefix + finalText,
                     Tag:     "lark_md",
                 },
             })
